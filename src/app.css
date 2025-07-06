@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  src: url("/fonts/ibm_plex_sans/IBMPlexSans-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Newsreader Italics";
+  src: url("/fonts/newsreader/Newsreader_14pt-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  hr {
+    @apply border-neutral-200;
+  }
+}
+
+@layer components {
+  .link {
+    @apply underline underline-offset-[3px] decoration-neutral-400 dark:decoration-neutral-500;
+    @apply hover:text-black hover:decoration-black transition-colors;
+    @apply dark:hover:text-white dark:hover:decoration-white;
+  }
+  .link-no-underline {
+    @apply decoration-neutral-400 dark:decoration-neutral-500;
+    @apply hover:text-black hover:decoration-black transition-colors hover:underline hover:underline-offset-[3px];
+    @apply dark:hover:text-white dark:hover:decoration-white;
+  }
+
+  .layout-md {
+    @apply max-w-[900px] mx-auto px-4 sm:px-6;
+  }
+
+  .heading2 {
+    @apply text-black text-xl font-semibold mb-4;
+  }
+}
+
+html {
+  @apply motion-safe:scroll-smooth;
+}
+
+body {
+  @apply /* antialiased */
+  py-12 sm:py-24 md:py-32 text-neutral-700;
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+.font-serif {
+  font-family: "Newsreader Italics", serif;
+}
+
+::selection {
+  @apply bg-sky-100 dark:bg-sky-600;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+@media screen and (min-width: 960px) {
+  html {
+    margin-left: calc(100vw - 100%);
+    margin-right: 0;
+  }
+}
