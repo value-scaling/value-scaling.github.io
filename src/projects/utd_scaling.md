@@ -10,12 +10,12 @@ resources:
   - label: arXiv
     url: https://arxiv.org/abs/2502.04327
   - label: Poster
-    url: null
+    url: /assets/files/utd_scaling_poster_icml.pdf
   - label: Thread
     url: https://x.com/_oleh/status/1889016893140516880
 ---
 
-[Oleh Rybkin](https://scholar.google.com/citations?user=CQEyVPMAAAAJ&hl=en),
+[Oleh Rybkin](https://olehrybkin.com/),
 [Michal Nauman](https://scholar.google.com/citations?user=GnEVRtQAAAAJ&hl=en),
 [Preston Fu](https://www.prestonfu.com/),
 [Charlie Snell](https://sea-snell.github.io/),

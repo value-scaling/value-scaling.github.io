@@ -23,10 +23,10 @@
   data-sveltekit-noscroll
   data-sveltekit-preload-code="eager"
 >
-  <a href="/" class="mb-8">
+  <div class="mb-8 unselectable">
     <div class="flex items-center">
       <h1 class="font-bold text-black text-3xl">
-        Value-Based RL Scales
+        Scaling Laws for Value-Based RL
         {#if pageTitle}
           <span class="page-title">
             <span class="text-neutral-400">—</span>
@@ -35,7 +35,7 @@
         {/if}
       </h1>
     </div>
-  </a>
+  </div>
   <!-- <nav>
     {#each links as link (link)}
       <a

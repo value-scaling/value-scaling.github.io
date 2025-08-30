@@ -29,7 +29,7 @@
 
 <div
   role="group"
-  class="block -mx-4 mb-4 px-4 py-4 transition-colors
+  class="block -mx-4 mb-4 px-4 py-4 transition-colors unselectable
     {data.highlight ? 'hover:bg-sky-50 bg-sky-50' : ''}
   "
   on:mouseenter={() => (hovered = true)}
@@ -46,7 +46,7 @@
       />
     </div>
     <div class="col-span-4 md:col-span-3">
-      <h3 class="text-black text-lg font-semibold mb-2">
+      <h3 class="text-black text-lg font-semibold mb-2 no-meter">
         <a class="link-no-underline mr-1" href={data.link} target="_blank">
           {data.title}
         </a>

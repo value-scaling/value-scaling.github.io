@@ -34,7 +34,7 @@
     renderer: (token: any) => `<span class="math math-inline">${renderMath(token.text, false)}</span>`
   };
 
-  const linkRenderer = {
+  const customRenderer = {
     link(href: string, title: string | null, text: string) {
       const isInternal = /^(\/|#|[A-Za-z0-9\-_]+(\.html?)?$)/.test(href);
       let out = `<a href="${encodeURI(href)}" class="link"`;
@@ -42,6 +42,17 @@
       if (title) out += ` title="${title}"`;
       out += `>${text}</a>`;
       return out;
+    },
+    heading(text: string, level: number, raw: string, slugger: any) {
+      const id = slugger ? slugger.slug(raw) : String(raw || text)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      // Keep plain heading text; the scroll meter will link to #id
+      return `<h${level} id="${id}">${text}</h${level}>`;
+    },
+    blockquote(quote: string) {
+      return `<blockquote class="inline-block bg-neutral-50 border-l-4 border-neutral-600 rounded px-3 py-2 align-middle my-2">${quote}</blockquote>`;
     }
   };
 
@@ -55,30 +66,61 @@
       if (match) {
         const [raw, alt, srcUrl, title, attrStr] = match;
         const attrs: Record<string, string> = {};
-        attrStr.split(/\s+/).forEach(pair => {
-          const [k, v] = pair.split('=');
-          if (k && v) attrs[k] = v.replace(/^["']|["']$/g, '');
+        attrStr.split(/\s+/).forEach(tok => {
+          if (!tok) return;
+          const eq = tok.indexOf('=');
+          if (eq === -1) {
+            attrs[tok] = '';
+          } else {
+            const k = tok.slice(0, eq);
+            const v = tok.slice(eq + 1).replace(/^["']|["']$/g, '');
+            if (k) attrs[k] = v;
+          }
         });
         return { type: 'imageAttr', raw, alt, src: srcUrl, title, attrs };
       }
     },
     renderer(token: any) {
-      let out = `<img src="${token.src}" alt="${token.alt}" class="block mx-auto"`;
-      for (const k in token.attrs) {
-        out += ` ${k}="${token.attrs[k]}"`;
+      const isVideoSrc = /\.(mp4|webm|ogg)(\?.*)?$/i.test(token.src);
+      const declaresVideo = token.attrs['type'] === 'video' || Object.prototype.hasOwnProperty.call(token.attrs, 'video');
+      if (isVideoSrc || declaresVideo) {
+        const lower = token.src.toLowerCase();
+        const sourceType =
+          token.attrs['source-type'] ||
+          (lower.endsWith('.webm') ? 'video/webm' : lower.endsWith('.ogg') ? 'video/ogg' : 'video/mp4');
+        let out = `<video class="block mx-auto" aria-label="${token.alt || ''}"`;
+        const hasControls = Object.prototype.hasOwnProperty.call(token.attrs, 'controls');
+        const hasPlaysinline = Object.prototype.hasOwnProperty.call(token.attrs, 'playsinline');
+        for (const k in token.attrs) {
+          if (k === 'type' || k === 'video' || k === 'source-type') continue;
+          const val = token.attrs[k];
+          out += val === '' ? ` ${k}` : ` ${k}="${val}"`;
+        }
+        if (!hasControls) out += ' controls';
+        if (!hasPlaysinline) out += ' playsinline';
+        out += `><source src="${token.src}" type="${sourceType}" /></video>`;
+        if (token.title) {
+          out += `<p class='text-center text-gray-500 mb-4'>${token.title}</p>`;
+        }
+        return out;
+      } else {
+        let out = `<img src="${token.src}" alt="${token.alt}" class="block mx-auto"`;
+        for (const k in token.attrs) {
+          out += ` ${k}="${token.attrs[k]}"`;
+        }
+        out += ' />';
+        if (token.title) {
+          out += `<p class='text-center text-gray-500 mb-4'>${token.title}</p>`;
+        }
+        return out;
       }
-      out += ' />';
-      if (token.title) {
-        out += `<p class='text-center text-gray-500 mb-4'>${token.title}</p>`;
-      }
-      return out;
     }
   };
 
   marked.use({
     gfm: true,
     extensions: [imageAttrExtension, mathBlock, mathInline],
-    renderer: linkRenderer
+    renderer: customRenderer
   });
 </script>
 
@@ -156,4 +198,7 @@
   :global(.math-block) { @apply my-4 text-center }
   :global(.math-inline) { @apply align-baseline }
   :global(.katex-error) { @apply text-red-600 bg-red-100 p-1 rounded }
+  :global(.md-output blockquote) { @apply inline-block align-middle bg-neutral-50 rounded px-3 py-2 my-2 border-l-4 border-neutral-600; }
+  :global(.md-output blockquote > :first-child) { @apply mt-0; }
+  :global(.md-output blockquote > :last-child) { @apply mb-0; }
 </style>

@@ -3,6 +3,7 @@
   import Seo from "$lib/components/Seo.svelte";
   import Markdown from "$lib/components/Markdown.svelte";
   import Jumpbox from "$lib/components/Jumpbox.svelte";
+  import ScrollMeter from "$lib/components/ScrollMeter.svelte";
 
   import { page } from "$app/stores";
   import { onMount } from "svelte";
@@ -63,20 +64,25 @@
 
 <Seo title="Value-Based RL Scales" description="A project by UC Berkeley, CMU, and friends." />
 
-<div class="layout-md text-lg space-y-12">
-  <div class="space-y-2">
-  {#each sortOrder === "date" ? projectsByDate : projectsByStars as id (id)}
-    <section id={trimName(id)}>
-      <!-- <div class="mx-auto max-w-[1152px] px-4 sm:px-6"> -->
-        <Project data={projects[id]} {stars} />
-      <!-- </div> -->
-    </section>
-  {/each}
-  </div>
-</div>
+<!-- <div class="with-meter"> -->
+<div>
+  <ScrollMeter containerSelector="#article .md-output" />
 
-<div class="layout-md text-lg space-y-12">
-  <Markdown source={maintext} />
+  <div class="layout-md text-lg space-y-12">
+    <div class="space-y-2">
+    {#each sortOrder === "date" ? projectsByDate : projectsByStars as id (id)}
+      <section id={trimName(id)}>
+        <!-- <div class="mx-auto max-w-[1152px] px-4 sm:px-6"> -->
+          <Project data={projects[id]} {stars} />
+        <!-- </div> -->
+      </section>
+    {/each}
+    </div>
+  </div>
+
+  <div class="layout-md text-lg space-y-12">
+    <Markdown source={maintext} />
+  </div>
 </div>
 
 <style lang="postcss">
@@ -102,4 +108,17 @@
       @apply -mt-10;
     }
   }
+
+    /* Reserve a left gutter so ScrollMeter labels can wrap without overlapping content. */
+  /* :global(.with-meter) { */
+    /* width for wrapped label text; adjust to taste */
+    /* --meter-gutter: 220px; */
+    /* total left padding = bar + tick line + gap + label width */
+    /* --meter-left-pad: calc(var(--meter-width, 14px) + var(--tick-length, 40px) + 8px + var(--meter-gutter)); */
+    /* padding-left: var(--meter-left-pad); */
+    /* position: relative; */
+  /* } */
+  /* @media (max-width: 1024px) { */
+    /* :global(.with-meter) { padding-left: 0; } */
+  /* } */
 </style>
