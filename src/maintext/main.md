@@ -1,7 +1,3 @@
-Card 1: [authors] [utd scaling arxiv] [poster] [[code](https://github.com/prestonfu/qscaled)]
-
-Card 2 (new!): [authors] [model scaling arxiv] [code]
-
 **[motivation gif]**
 
 Large models are slow and expensive to train, so we like to prototype research ideas on small scales before scaling up to larger budgets. This workflow assumes some guarantee of _predictability._ For example, the field has shown that language model pretraining [is predictable](https://arxiv.org/abs/2001.08361) — provided the "right" design decisions.
@@ -98,9 +94,7 @@ In our answer to this question, we unlock several surprising findings on off-pol
 
 ### …when I scale the UTD?
 
-```markdown
-Box linking to UTD scaling paper
-```
+:::jumpbox id="utd_scaling":::
 
 Let's first look at the case of UTD-only scaling at a constant model size. Empirically, we find that performance is most sensitive to changes in batch size and learning rate, and we'll focus on these hyperparameters.
 
@@ -116,19 +110,20 @@ We also observe that high UTD ratios lead to **plasticity loss**, i.e. the inabi
 
 **Figure n:** Parameter norm, a proxy for plasticity loss, increases with both UTD and learning rate.
 
-```markdown
-Takeaways:
+<!-- ```markdown -->
+
+:::takeaway_begin:::
 
 - Decrease batch size with UTD. In our first paper, we showed empirically that it should
   decay as a power law.
 - Decrease learning rate with UTD, also empirically following a power law.
-```
+  :::takeaway_end:::
+
+<!-- ``` -->
 
 ### …when I scale the model size?
 
-```markdown
-Box linking to UTD+N scaling paper
-```
+:::jumpbox id="model_scaling":::
 
 Let's now look at the case of model size scaling at a constant UTD.
 
@@ -166,9 +161,7 @@ Takeaways:
 
 ## Budget-optimal UTD scaling
 
-```markdown
-Box linking to UTD scaling paper
-```
+:::jumpbox id="utd_scaling":::
 
 As before, we'll first consider UTD-only scaling at a constant model size. Armed with the best-choice batch size and learning rate, we can optimize the data efficiency. Empirically, we find that **data efficiency scales as a power law with respect to UTD, across multiple domains, tasks, and algorithms**!
 
@@ -200,9 +193,7 @@ Takeaways:
 
 ## Budget-optimal scaling for UTD and model size
 
-```markdown
-Box linking to UTD+N scaling paper
-```
+:::jumpbox id="model_scaling":::
 
 **Step 1:** Now, we'll additionally leverage our understanding of TD-overfitting via our batch size fit. Assuming this fit, we find that **data efficiency scales as a sum of power laws with respect to the UTD and model size**. (In Section 6 of [our new paper](https://arxiv.org/abs/2508.14881), we also run a sensitivity analysis to show the importance of using the right batch size.)
 

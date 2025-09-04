@@ -126,45 +126,96 @@
 
 <script lang="ts">
   import Jumpbox from "./Jumpbox.svelte";
-
+  import TakeawayBox from './TakeawayBox.svelte';
+  
   export let source: string;
 
-  const JUMP_RE = /^:::jumpbox\s+id="([^"]+)"(?:\s+label="([^"]+)")?\s*:::/m;
+  type Chunk =
+    | { type: 'text'; content: string }
+    | { type: 'jumpbox'; id: string; label: string }
+    | { type: 'takeaway'; content: string };
 
-  type Chunk = { type: "text"; content: string } | { type: "jumpbox"; id: string; label: string };
-
-  $: chunks = (() => {
-    const out: Chunk[] = [];
-    let rest = source;
-    let match: RegExpExecArray | null;
-
-    while ((match = JUMP_RE.exec(rest))) {
-      const [raw, id, label] = match;
-      const idx = match.index;
-
-      if (idx > 0) {
-        out.push({ type: "text", content: rest.slice(0, idx) });
-      }
-
-      out.push({ type: "jumpbox", id, label: label ?? id });
-      rest = rest.slice(idx + raw.length);
-    }
-
-    if (rest) out.push({ type: "text", content: rest });
-    return out;
-  })();
+  // Regexes (global + multiline). We scan by hand using lastIndex.
+  const JUMP_RE = /:::jumpbox\s+id="([^"]+)"(?:\s+label="([^"]+)")?\s*:::/gm;
+  const TAKE_BEGIN_RE = /:::takeaway_begin:::/gm;
+  const TAKE_END_RE = /:::takeaway_end:::/gm;
 
   function toHtml(md: string) {
     return marked.parse(md, { smartypants: true });
   }
+
+  // One-pass tokenizer across the whole document
+  $: chunks = (() => {
+    const out: Chunk[] = [];
+    let pos = 0;
+
+    while (pos < source.length) {
+      // Find next possible jumpbox or takeaway-begin after pos
+      JUMP_RE.lastIndex = pos;
+      TAKE_BEGIN_RE.lastIndex = pos;
+
+      const j = JUMP_RE.exec(source);
+      const t = TAKE_BEGIN_RE.exec(source);
+
+      // No more markers → push rest as text and stop
+      if (!j && !t) {
+        if (pos < source.length) out.push({ type: 'text', content: source.slice(pos) });
+        break;
+      }
+
+      // Choose the earliest marker by index
+      const j_idx = j ? j.index : Infinity;
+      const t_idx = t ? t.index : Infinity;
+
+      if (j_idx <= t_idx) {
+        // Emit pre-text
+        if (j_idx > pos) out.push({ type: 'text', content: source.slice(pos, j_idx) });
+
+        const id = j![1];
+        const label = j![2] ?? id;
+        out.push({ type: 'jumpbox', id, label });
+
+        // Advance past this jumpbox
+        pos = JUMP_RE.lastIndex;
+      } else {
+        // Takeaway begin comes first
+        const begin_idx = t!.index;
+        const begin_end = begin_idx + t![0].length;
+
+        // Emit pre-text
+        if (begin_idx > pos) out.push({ type: 'text', content: source.slice(pos, begin_idx) });
+
+        // Find matching end after the begin
+        TAKE_END_RE.lastIndex = begin_end;
+        const tend = TAKE_END_RE.exec(source);
+
+        if (!tend) {
+          // No closing marker → treat the begin marker as plain text (no guessing)
+          out.push({ type: 'text', content: source.slice(begin_idx, begin_end) });
+          pos = begin_end;
+          continue;
+        }
+
+        const inner_md = source.slice(begin_end, tend.index).trim();
+        out.push({ type: 'takeaway', content: inner_md });
+
+        // Advance past the end marker
+        pos = TAKE_END_RE.lastIndex;
+      }
+    }
+
+    return out;
+  })();
 </script>
 
 <div class="md-output space-y-6">
-  {#each chunks as chunk (chunk)}
-    {#if chunk.type === "text"}
-      <div>{@html toHtml(chunk.content)}</div>
-    {:else}
+  {#each chunks as chunk, i (i)}
+    {#if chunk.type === 'text'}
+      <div class="md-output">{@html toHtml(chunk.content)}</div>
+    {:else if chunk.type === 'jumpbox'}
       <Jumpbox id={chunk.id} label={chunk.label} />
+    {:else if chunk.type === 'takeaway'}
+      <TakeawayBox html={toHtml(chunk.content)} />
     {/if}
   {/each}
 </div>

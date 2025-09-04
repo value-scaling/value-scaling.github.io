@@ -9,10 +9,12 @@ image_after: /assets/images/qscaled_after.gif
 resources:
   - label: arXiv
     url: https://arxiv.org/abs/2502.04327
-  - label: Poster
-    url: /assets/files/utd_scaling_poster_icml.pdf
+  - label: Code
+    url: https://github.com/prestonfu/qscaled
   - label: Thread
     url: https://x.com/_oleh/status/1889016893140516880
+  - label: Poster
+    url: /assets/files/utd_scaling_poster_icml.pdf
 ---
 
 [Oleh Rybkin](https://olehrybkin.com/),

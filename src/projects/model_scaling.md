@@ -3,14 +3,16 @@ title: Compute-Optimal Scaling for Value-Based Deep RL
 link: https://arxiv.org/abs/2508.14881
 date: 2025-07-07
 highlight: true
-image_before: /assets/images/model_scaling_temp.png
-image_after: /assets/images/model_scaling_temp.png
+image_before: /assets/images/model_scaling_before.png
+image_after: /assets/images/model_scaling_3d.mp4
 
 resources:
   - label: arXiv
     url: https://arxiv.org/abs/2508.14881
-  - label: code
-    url: null
+  - label: Code
+    url: https://github.com/prestonfu/model_scaling
+  - label: Thread
+    url: https://x.com/preston_fu/status/1962920781387882841
 ---
 
 [Preston Fu](https://www.prestonfu.com/)\*,

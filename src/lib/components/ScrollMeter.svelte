@@ -238,6 +238,10 @@
     background: #595959;              /* neutral-400 */
   }
 
+  .tick::before::hover {
+    background: neutral-900;
+  }
+
   .tick:hover {
     opacity: 1;
   }
@@ -251,6 +255,10 @@
   .tick.sub::before {
     width: calc(var(--tick-length) * 0.7);
     background: #868686; /* lighter gray */
+  }
+
+  .tick.sub::before::hover {
+    background: neutral-900;
   }
 
   /* Active tick (closest passed heading at viewport center) */

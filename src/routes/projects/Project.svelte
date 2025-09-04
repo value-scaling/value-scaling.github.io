@@ -24,7 +24,31 @@
   export let stars: Record<string, number> | null = null;
 
   let hovered = false;
-  $: image_path = hovered ? data.image_after : data.image_before;
+  // Treat image_after as an MP4 if it ends with .mp4; otherwise fall back to image hover swap.
+  let is_video: boolean;
+  $: is_video = /\.mp4($|\?)/.test(data.image_after ?? "");
+  $: image_path = is_video
+    ? `${data.image_before}`
+    : hovered
+      ? `${data.image_after}`
+      : `${data.image_before}`;
+
+  let video_el: HTMLVideoElement | null = null;
+
+  const DEBUG = false;
+  const log = (...args: any[]) => { if (DEBUG) console.log("[hover-video]", ...args); };
+  let detach_listeners: Array<() => void> = [];
+  function attachDebug(v: HTMLVideoElement) {
+    // Log key media events and states
+    const events = ["loadedmetadata","canplay","canplaythrough","play","pause","waiting","stalled","suspend","error","ended","timeupdate"];
+    events.forEach((type) => {
+      const h = (e: Event) => log(type, { readyState: v.readyState, networkState: v.networkState, currentTime: v.currentTime, paused: v.paused });
+      v.addEventListener(type, h);
+      detach_listeners.push(() => v.removeEventListener(type, h));
+    });
+    log("bound video", { src: data.image_after, canPlayType: v.canPlayType("video/mp4") });
+    if (v.error) log("initial mediaError", v.error);
+  }
 </script>
 
 <div
@@ -32,18 +56,54 @@
   class="block -mx-4 mb-4 px-4 py-4 transition-colors unselectable
     {data.highlight ? 'hover:bg-sky-50 bg-sky-50' : ''}
   "
-  on:mouseenter={() => (hovered = true)}
-  on:mouseleave={() => (hovered = false)}
+  on:mouseenter={() => {
+    hovered = true;
+    if (!is_video || !video_el) return;
+    // if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    //   log("skipping play due to prefers-reduced-motion");
+    //   return;
+    // }
+    video_el.muted = true;
+    video_el.playsInline = true;
+    const p = video_el.play();
+    log("play() called", { readyState: video_el.readyState, networkState: video_el.networkState });
+    p.then(() => log("play() resolved")).catch((err) => log("play() rejected", err?.name, err?.message));
+  }}
+  on:mouseleave={() => {
+    hovered = false;
+    if (is_video && video_el) {
+      video_el.pause();
+      try { video_el.currentTime = 0; } catch {}
+    }
+  }}
 >
   <div class="grid grid-cols-4 gap-4">
     <!-- image & title as before… -->
     <div class="col-span-4 md:col-span-1">
-      <img
-        src="{image_path}"
-        alt="{data.title} preview image"
-        class:border={data.image_border}
-        class="w-full max-w-40 mx-auto"
-      />
+      <div class="relative w-full max-w-80 mx-auto">
+        <img
+          src="{image_path}"
+          alt="{data.title} preview image"
+            class:border={data.image_border}
+            class="w-full block"
+          />
+        {#if is_video}
+          <video
+            bind:this={video_el}
+            class="absolute inset-0 w-full h-full object-cover pointer-events-none"
+            style="opacity: {hovered ? 1 : 0}; transition: opacity 160ms ease;"
+            preload="metadata"
+            muted
+            loop
+            playsinline
+            aria-hidden="true"
+            tabindex="-1"
+            poster="{data.image_before}"
+          >
+            <source src="{data.image_after}" type="video/mp4" />
+          </video>
+        {/if}
+      </div>
     </div>
     <div class="col-span-4 md:col-span-3">
       <h3 class="text-black text-lg font-semibold mb-2 no-meter">
