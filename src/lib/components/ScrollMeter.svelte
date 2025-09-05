@@ -168,7 +168,8 @@
 <style>
   :root {
     --meter-width: 14px;   /* width of the vertical bar on the far left */
-    --tick-length: 30px;   /* ticks extend into the page beyond the bar */
+    --tick-length: 22px;   /* ticks extend into the page beyond the bar */
+    --tick-length-sub: 18px;   /* ticks extend into the page beyond the bar */
     --tick-hitbox: 18px;
     --tick-line: 2px;
     --tick-color: #9ca3af; /* neutral-400 */
@@ -253,7 +254,7 @@
   }
 
   .tick.sub::before {
-    width: calc(var(--tick-length) * 0.7);
+    width: calc(var(--tick-length-sub));
     background: #868686; /* lighter gray */
   }
 

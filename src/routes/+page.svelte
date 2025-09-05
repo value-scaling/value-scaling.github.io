@@ -62,7 +62,7 @@
 
 </script>
 
-<Seo title="Value-Based RL Scales" description="A project by UC Berkeley, CMU, and friends." />
+<Seo title="Scaling Laws for Value-Based RL" description="With the right design decisions, value-based RL admits predictable scaling." />
 
 <!-- <div class="with-meter"> -->
 <div>

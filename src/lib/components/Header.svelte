@@ -19,22 +19,23 @@
 </script>
 
 <header
-  class="layout-md flex justify-between items-start"
+  class="layout-md justify-between items-start"
   data-sveltekit-noscroll
   data-sveltekit-preload-code="eager"
 >
   <div class="mb-8 unselectable">
-    <div class="flex items-center">
-      <h1 class="font-bold text-black text-3xl">
-        Scaling Laws for Value-Based RL
-        {#if pageTitle}
-          <span class="page-title">
-            <span class="text-neutral-400">—</span>
-            {pageTitle}
-          </span>
-        {/if}
-      </h1>
-    </div>
+    <h1 class="font-bold text-black text-3xl mb-4">
+      Scaling Laws for Value-Based RL
+    </h1>
+    <p class="text-black text-lg">
+      <a href="https://prestonfu.com" class="link-no-underline">Preston Fu</a>,
+      <a href="https://olehrybkin.com/" class="link-no-underline">Oleh Rybkin</a>,
+      <a href="https://aviralkumar2907.github.io/" class="link-no-underline">Aviral Kumar</a>
+      <br>
+      UC Berkeley, CMU
+      <br>
+      September 2025
+    </p>
   </div>
   <!-- <nav>
     {#each links as link (link)}

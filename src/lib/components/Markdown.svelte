@@ -83,12 +83,13 @@
     renderer(token: any) {
       const isVideoSrc = /\.(mp4|webm|ogg)(\?.*)?$/i.test(token.src);
       const declaresVideo = token.attrs['type'] === 'video' || Object.prototype.hasOwnProperty.call(token.attrs, 'video');
+      let out = '';
       if (isVideoSrc || declaresVideo) {
         const lower = token.src.toLowerCase();
         const sourceType =
           token.attrs['source-type'] ||
           (lower.endsWith('.webm') ? 'video/webm' : lower.endsWith('.ogg') ? 'video/ogg' : 'video/mp4');
-        let out = `<video class="block mx-auto" aria-label="${token.alt || ''}"`;
+        out += `<video class="block mx-auto" aria-label="${token.alt || ''}"`;
         const hasControls = Object.prototype.hasOwnProperty.call(token.attrs, 'controls');
         const hasPlaysinline = Object.prototype.hasOwnProperty.call(token.attrs, 'playsinline');
         for (const k in token.attrs) {
@@ -98,22 +99,18 @@
         }
         if (!hasControls) out += ' controls';
         if (!hasPlaysinline) out += ' playsinline';
-        out += `><source src="${token.src}" type="${sourceType}" /></video>`;
-        if (token.title) {
-          out += `<p class='text-center text-gray-500 mb-4'>${token.title}</p>`;
-        }
-        return out;
+        out += `><source src="${token.src}#t=0.1" type="${sourceType}" /></video>`;
       } else {
-        let out = `<img src="${token.src}" alt="${token.alt}" class="block mx-auto"`;
+        out += `<img src="${token.src}" alt="${token.alt}" class="block mx-auto"`;
         for (const k in token.attrs) {
           out += ` ${k}="${token.attrs[k]}"`;
         }
         out += ' />';
-        if (token.title) {
-          out += `<p class='text-center text-gray-500 mb-4'>${token.title}</p>`;
-        }
-        return out;
       }
+      if (token.title) {
+        out += `<div class='text-center text-gray-500 mb-4 md:px-8 lg:px-12 text-sm'>${marked.parse(token.title, { smartypants: true })}</div>`;
+      }
+      return out;
     }
   };
 
