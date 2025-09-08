@@ -1,0 +1,313 @@
+import {
+  j as M,
+  s as g,
+  n as h,
+  i as P,
+  o as B,
+  c as j,
+  u as U,
+  g as L,
+  e as D,
+  k as Y,
+} from "../chunks/scheduler.BgYmKTTO.js";
+import {
+  S as H,
+  i as O,
+  g as v,
+  h as $,
+  C as q,
+  k as y,
+  b as m,
+  f,
+  s as S,
+  r as z,
+  e as b,
+  c as A,
+  u as F,
+  v as G,
+  a as _,
+  t as d,
+  w as K,
+  p as W,
+  d as Z,
+  j as R,
+  D as x,
+  E as J,
+} from "../chunks/index.A5wVaqv5.js";
+import { p as Q } from "../chunks/stores.DWJQ43d4.js";
+import { a as X } from "../chunks/entry.CAiE-jW-.js";
+const ee = !0,
+  te = "always",
+  ae = async ({ url: r }) => ({ pathname: r.pathname }),
+  he = Object.freeze(
+    Object.defineProperty(
+      { __proto__: null, load: ae, prerender: ee, trailingSlash: te },
+      Symbol.toStringTag,
+      { value: "Module" },
+    ),
+  );
+function ne(r) {
+  const a = r - 1;
+  return a * a * a + 1;
+}
+function E(
+  r,
+  {
+    delay: a = 0,
+    duration: s = 400,
+    easing: o = ne,
+    x: t = 0,
+    y: e = 0,
+    opacity: n = 0,
+  } = {},
+) {
+  const l = getComputedStyle(r),
+    c = +l.opacity,
+    p = l.transform === "none" ? "" : l.transform,
+    k = c * (1 - n),
+    [i, u] = M(t),
+    [T, V] = M(e);
+  return {
+    delay: a,
+    duration: s,
+    easing: o,
+    css: (w, I) => `
+			transform: ${p} translate(${(1 - w) * i}${u}, ${(1 - w) * T}${V});
+			opacity: ${c - k * I}`,
+  };
+}
+function se(r) {
+  let a,
+    s = `<div class="mb-8 unselectable"><h1 class="font-bold text-black text-3xl mb-4">Scaling Laws for Value-Based RL</h1> <p class="text-black text-lg"><a href="https://prestonfu.com" class="link-no-underline">Preston Fu</a>,
+      <a href="https://olehrybkin.com/" class="link-no-underline">Oleh Rybkin</a>,
+      <a href="https://aviralkumar2907.github.io/" class="link-no-underline">Aviral Kumar</a> <br/>
+      UC Berkeley, CMU
+      <br/>
+      September 2025</p></div>`;
+  return {
+    c() {
+      (a = v("header")), (a.innerHTML = s), this.h();
+    },
+    l(o) {
+      (a = $(o, "HEADER", {
+        class: !0,
+        "data-sveltekit-noscroll": !0,
+        "data-sveltekit-preload-code": !0,
+        "data-svelte-h": !0,
+      })),
+        q(a) !== "svelte-2063xj" && (a.innerHTML = s),
+        this.h();
+    },
+    h() {
+      y(a, "class", "layout-md justify-between items-start"),
+        y(a, "data-sveltekit-noscroll", ""),
+        y(a, "data-sveltekit-preload-code", "eager");
+    },
+    m(o, t) {
+      m(o, a, t);
+    },
+    p: h,
+    i: h,
+    o: h,
+    d(o) {
+      o && f(a);
+    },
+  };
+}
+function oe(r, a, s) {
+  let o;
+  P(r, Q, (e) => s(0, (o = e)));
+  const t = [{ name: "Notes", href: "/notes" }];
+  return (
+    (r.$$.update = () => {
+      if (r.$$.dirty & 1) {
+        const e = t.find(({ href: n }) => n === o.url.pathname);
+        e && e.name.charAt(0).toUpperCase() + e.name.slice(1);
+      }
+    }),
+    [o]
+  );
+}
+class re extends H {
+  constructor(a) {
+    super(), O(this, a, oe, se, g, {});
+  }
+}
+function le(r) {
+  let a = r[0].pathname,
+    s,
+    o,
+    t = C(r);
+  return {
+    c() {
+      t.c(), (s = b());
+    },
+    l(e) {
+      t.l(e), (s = b());
+    },
+    m(e, n) {
+      t.m(e, n), m(e, s, n), (o = !0);
+    },
+    p(e, n) {
+      n & 1 && g(a, (a = e[0].pathname))
+        ? (W(),
+          d(t, 1, 1, h),
+          Z(),
+          (t = C(e)),
+          t.c(),
+          _(t, 1),
+          t.m(s.parentNode, s))
+        : t.p(e, n);
+    },
+    i(e) {
+      o || (_(t), (o = !0));
+    },
+    o(e) {
+      d(t), (o = !1);
+    },
+    d(e) {
+      e && f(s), t.d(e);
+    },
+  };
+}
+function ie(r) {
+  let a, s;
+  const o = r[4].default,
+    t = j(o, r, r[3], null);
+  return {
+    c() {
+      (a = v("main")), t && t.c();
+    },
+    l(e) {
+      a = $(e, "MAIN", {});
+      var n = R(a);
+      t && t.l(n), n.forEach(f);
+    },
+    m(e, n) {
+      m(e, a, n), t && t.m(a, null), (s = !0);
+    },
+    p(e, n) {
+      t &&
+        t.p &&
+        (!s || n & 8) &&
+        U(t, o, e, e[3], s ? D(o, e[3], n, null) : L(e[3]), null);
+    },
+    i(e) {
+      s || (_(t, e), (s = !0));
+    },
+    o(e) {
+      d(t, e), (s = !1);
+    },
+    d(e) {
+      e && f(a), t && t.d(e);
+    },
+  };
+}
+function C(r) {
+  let a, s, o, t;
+  const e = r[4].default,
+    n = j(e, r, r[3], null);
+  return {
+    c() {
+      (a = v("main")), n && n.c();
+    },
+    l(l) {
+      a = $(l, "MAIN", {});
+      var c = R(a);
+      n && n.l(c), c.forEach(f);
+    },
+    m(l, c) {
+      m(l, a, c), n && n.m(a, null), (t = !0);
+    },
+    p(l, c) {
+      n &&
+        n.p &&
+        (!t || c & 8) &&
+        U(n, e, l, l[3], t ? D(e, l[3], c, null) : L(l[3]), null);
+    },
+    i(l) {
+      t ||
+        (_(n, l),
+        l &&
+          Y(() => {
+            t &&
+              (o && o.end(1),
+              (s = x(a, E, { x: -10, duration: 350, delay: 350 })),
+              s.start());
+          }),
+        (t = !0));
+    },
+    o(l) {
+      d(n, l),
+        s && s.invalidate(),
+        l && (o = J(a, E, { y: 5, duration: 350 })),
+        (t = !1);
+    },
+    d(l) {
+      l && f(a), n && n.d(l), l && o && o.end();
+    },
+  };
+}
+function ce(r) {
+  let a, s, o, t, e, n, l;
+  s = new re({});
+  const c = [ie, le],
+    p = [];
+  function k(i, u) {
+    return i[1] || i[2] ? 0 : 1;
+  }
+  return (
+    (t = k(r)),
+    (e = p[t] = c[t](r)),
+    {
+      c() {
+        (a = S()), z(s.$$.fragment), (o = S()), e.c(), (n = b());
+      },
+      l(i) {
+        (a = A(i)), F(s.$$.fragment, i), (o = A(i)), e.l(i), (n = b());
+      },
+      m(i, u) {
+        m(i, a, u), G(s, i, u), m(i, o, u), p[t].m(i, u), m(i, n, u), (l = !0);
+      },
+      p(i, [u]) {
+        e.p(i, u);
+      },
+      i(i) {
+        l || (_(s.$$.fragment, i), _(e), (l = !0));
+      },
+      o(i) {
+        d(s.$$.fragment, i), d(e), (l = !1);
+      },
+      d(i) {
+        i && (f(a), f(o), f(n)), K(s, i), p[t].d(i);
+      },
+    }
+  );
+}
+const ue = "G-ZSV2YDNY0W";
+function N(r) {
+  window.gtag &&
+    window.gtag("config", ue, { page_path: r.pathname + r.search + r.hash });
+}
+function fe(r, a, s) {
+  let { $$slots: o = {}, $$scope: t } = a,
+    { data: e } = a;
+  const n = /Android|iPhone/i.test(navigator.userAgent),
+    l = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  return (
+    B(() => {
+      N(window.location), X(() => N(window.location));
+    }),
+    (r.$$set = (c) => {
+      "data" in c && s(0, (e = c.data)),
+        "$$scope" in c && s(3, (t = c.$$scope));
+    }),
+    [e, n, l, t, o]
+  );
+}
+class be extends H {
+  constructor(a) {
+    super(), O(this, a, fe, ce, g, { data: 0 });
+  }
+}
+export { be as component, he as universal };

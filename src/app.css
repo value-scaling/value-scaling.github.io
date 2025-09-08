@@ -84,3 +84,7 @@ body {
 hr {
   @apply border-neutral-300;
 }
+
+code {
+  font-size: 10rem;
+}

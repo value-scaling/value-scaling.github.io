@@ -390,12 +390,47 @@
     fresh.forEach((v) => io.observe(v));
   }
 
+  function makeCodeBlocksCopyable(root: HTMLElement) {
+    const blocks = Array.from(root.querySelectorAll('pre > code')) as HTMLElement[];
+
+    for (const code of blocks) {
+      const pre = code.parentElement as HTMLElement;
+      if (!pre || pre.dataset.copyable) continue; // don’t duplicate
+
+      pre.dataset.copyable = 'true';
+      pre.style.position = 'relative';
+
+      // Build button
+      const button = document.createElement('button');
+      button.textContent = 'Copy';
+      button.className = 'copy-btn';
+      button.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(code.innerText);
+          button.textContent = 'Copied!';
+          setTimeout(() => (button.textContent = 'Copy'), 1500);
+        } catch {
+          button.textContent = 'Error';
+          setTimeout(() => (button.textContent = 'Copy'), 1500);
+        }
+      });
+
+      pre.appendChild(button);
+    }
+  }
+
   onMount(() => {
-    if (container) setupVideos(container);
+    if (container) {
+      setupVideos(container);
+      makeCodeBlocksCopyable(container);
+    }
   });
 
   afterUpdate(() => {
-    if (container) setupVideos(container); // handle markdown re-render
+    if (container) {
+      setupVideos(container); // handle markdown re-render
+      makeCodeBlocksCopyable(container);
+    }
   });
 
   onDestroy(() => {
@@ -485,6 +520,7 @@
     @apply mb-0;
   }
   /* Small-section overrides: drop each heading one step inside .sm-block */
+  /* :global(.sm-block) { font-size: 0.875rem; } */
   :global(.sm-block h1) { @apply text-2xl font-bold mt-6 mb-4; }
   :global(.sm-block h2) { @apply text-xl font-semibold mt-5 mb-3; }
   :global(.sm-block h3) { @apply text-lg font-semibold mt-4 mb-2; }
@@ -493,5 +529,26 @@
   :global(.sm-block code) { @apply text-[90%]; }
   /* Optional: tighten paragraphs slightly in small blocks */
   /* :global(.sm-block p) { @apply mb-3; } */
+
+  :global(pre[data-copyable]) {
+    position: relative;
+  }
+
+  :global(pre[data-copyable] .copy-btn) {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+    background: #f3f4f6; /* neutral-100 */
+    font-size: 0.75rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    opacity: 1;
+    transition: opacity 0.2s;
+  }
+
+  :global(pre[data-copyable]:hover .copy-btn) {
+    opacity: 1;
+  }
 
 </style>

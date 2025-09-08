@@ -1,8 +1,8 @@
-In the era of large-scale AI, it is important to prototype new training methodologies at small scales before running at large scales or datasets. This workflow only works if the training outcomes are predictable — we need experimentation workflows for which results at small scale can reliably forecast behavior at large scale without running the full experiment. To build predictable workflows, the community has followed the path of estimating _scaling laws_: rules that fit the target performance metric as a function of resources (e.g., data, compute) available to the practitioner under the “right” design decisions for setting up training. Scaling laws can then inform practitioners how to most reliably obtain performance at scale. For example, [prior](https://arxiv.org/abs/2203.03466) [work](https://arxiv.org/abs/2001.08361) establishes that it is possible to estimate the best batch size and model width and depth from small-scale runs, and leverages this predictability to predict the best configuration for an extrapolated model size. _Can we build similar workflows for reinforcement learning (RL) algorithms?_ In this blog post, we explore whether online RL algorithms obey scaling laws and how such laws can guide the design of future RL systems.
+In the era of large-scale AI, it is important to prototype new training methodologies at small scales before running at large scales or datasets. This workflow only works if the training outcomes are predictable — we need experimentation workflows for which results at small scale can reliably forecast behavior at large scale without running the full experiment. To build predictable workflows, the community has followed the path of estimating _scaling laws_: rules that fit the target performance metric as a function of resources (e.g., data, compute) available to the practitioner under the “right” design decisions for setting up training. Scaling laws can then inform practitioners how to most reliably obtain performance at scale. For example, [prior](https://arxiv.org/abs/2203.03466) [work](https://arxiv.org/abs/2001.08361) establishes that it is possible to estimate the best batch size and model width and depth from small-scale runs, and leverages this predictability to predict the best configuration for an extrapolated model size. _Can we build similar workflows for reinforcement learning (RL) algorithms?_ In this blog post, we explore whether we can derive scaling laws for online RL algorithms.
 
-Our blog is based on a series of two papers that challenge the conventional wisdom that the off-policy RL methods we study are fundamentally unpredictable. As we discuss below, as long as we follow careful workflows to predict hyperparameters, **value-based RL is predictable**. That said, establishing scaling laws for off-policy RL is substantially harder than standard LLM training: while most scaling law studies assume a fixed data distribution, RL admits a moving data distribution and accumulation of previous data (”replay buffers”).
+Our blog is based on a series of two papers that challenge the conventional wisdom that value-based off-policy RL methods are fundamentally unpredictable. As we discuss below, as long as we follow careful workflows to predict hyperparameters, **value-based RL is predictable**. That said, establishing scaling laws for off-policy RL is substantially harder than standard LLM training: while most scaling law studies assume a fixed data distribution, RL admits a moving data distribution and accumulation of previous data (”replay buffers”).
 
-![3D data efficiency plot](/assets/images/h1stand_3d.mp4 "**Figure 1:** We are able to estimate scaling laws for value-based RL."){width=600px}
+![3D data efficiency plot](/assets/images/h1stand_3d.mp4 "**Figure 1:** We are able to estimate scaling laws for value-based RL. Data efficiency is predictable with respect to UTD and model size, unlocking compute-optimal scaling."){width=600px}
 
 ## Part I: Challenges of estimating scaling laws for RL
 
@@ -10,21 +10,21 @@ Let’s start by attempting to understand the challenges we need to resolve to e
 
 > _Given a large, unseen budget on resources (i.e., data and compute for our study), how can we achieve the best possible performance?_
 
-To make this question concrete, let’s work through the case of supervised learning. In LLM research, the budget corresponds to the total compute used for training, measured in FLOPs, and the performance metric is test perplexity. This budget can be further decomposed into a function of the model size, the dataset size, and hyperparameters (number of epochs and batch size): $\text{compute} \propto \text{dataset size} \times \text{epochs} \times \text{batch size} \times \text{model size}.$
+To make this question concrete, let’s work through the case of LLM pre-training. In LLM research, the budget corresponds to the total compute used for training, measured in FLOPs, and the performance metric is test perplexity. This budget can be further decomposed into a function of the model size, the dataset size, and hyperparameters (number of epochs and batch size): $\text{compute} \propto \text{dataset size} \times \text{epochs} \times \text{batch size} \times \text{model size}.$
 
-Within this framework, the field of supervised learning has arrived at conclusions on the optimal [data-epoch tradeoff](https://arxiv.org/abs/2305.16264), the [data-model tradeoff](https://arxiv.org/abs/2001.08361), and the [critical batch size](https://arxiv.org/abs/1812.06162), together prescribing rules for setting hyperparameters and characterizing how performance metrics depend on available resources when hyperparameters are set accordingly. This enabled simple [power laws](https://arxiv.org/abs/2001.08361) forecasting the loss in terms of model size and dataset size. With the right batch size and epoch count, balancing between model size and dataset size laid the groundwork to train large models [compute-optimally](https://arxiv.org/abs/2203.15556).
+Within this framework, researchers have arrived at conclusions on the optimal [data-epoch tradeoff](https://arxiv.org/abs/2305.16264), the [data-model tradeoff](https://arxiv.org/abs/2001.08361), and the [critical batch size](https://arxiv.org/abs/1812.06162), together prescribing rules for setting hyperparameters and characterizing how performance metrics depend on available resources when hyperparameters are set accordingly. This enabled simple [power laws](https://arxiv.org/abs/2001.08361) forecasting the loss in terms of model size and dataset size. With the right batch size and epoch count, balancing between model size and dataset size laid the groundwork to train large models [compute-optimally](https://arxiv.org/abs/2203.15556).
 
 We follow a similar protocol for RL, though hyperparameters and performance metrics vary substantially between LLM pre-training and RL. We first describe how RL scaling laws are different, then dive into estimating them.
 
 ## What makes RL scaling laws different?
 
-Let’s now make the scaling question concrete in the context of RL. While LLM pre-training assumes access to i.i.d. high-quality training data, in RL, data is collected by the learning algorithm itself, which means that data is now a resource. Indeed RL research often optimizes for sample-efficiency, in an attempt to maximize performance given a fixed number of samples. We will denote the resource of data as $\mathcal D$. In addition, like pre-training, RL will spend FLOPs during training, which means compute $\mathcal C$ spent training on the data is still a resource. While compute $\mathcal{C}$ depends on data $\mathcal{D}$, data needs to be acquired “in-the-loop” — often by running an intermediate policy online — meaning that the process of data collection itself spends additional time or GPU/CPU computation. Therefore, it is more beneficial to consider a more holistic notion of budget that combines $\mathcal{C}$ and $\mathcal{D}$: $\mathcal{F} =$ $\mathcal C + \delta \cdot \mathcal D$, where $\delta$ is a domain-specific constant.
+Let’s now make the scaling question concrete in the context of RL. While LLM pre-training assumes access to i.i.d. high-quality training data, in RL, data is collected by the learning algorithm itself, which means that data is now a resource. Indeed RL research often optimizes for sample-efficiency, in an attempt to maximize performance given a fixed number of samples. We will denote the resource of data as $\mathcal D$. In addition, like pre-training, RL will spend FLOPs during training, which means compute $\mathcal C$ spent training on the data is still a resource. While compute $\mathcal{C}$ depends on data $\mathcal{D}$ for any ML procedure, online RL collects data “in-the-loop” by running intermediate policies online — meaning that the process of data collection itself spends additional time or GPU/CPU computation. Therefore, it is more beneficial to consider a more holistic notion of budget that combines $\mathcal{C}$ and $\mathcal{D}$: $\mathcal{F} =$ $\mathcal C + \delta \cdot \mathcal D$, where $\delta$ is a domain-specific constant.
 
 The performance metric is an agent’s performance, i.e. the average return attained by the agent. This setup gives us our problem statement:
 
 > _Given a limited budget_ $\mathcal F_0$_, on a combination $\mathcal{F} = \mathcal C + \delta \cdot \mathcal D$ of compute and data, how do we achieve the best possible return_ $J^*$_?_
 
-In practice, this problem is hard to answer directly, since the reward scale can make return unpredictable without actually changing the optimal policy at all. Therefore, we’ll consider the dual problem. Define **data efficiency** $\mathcal D_J$ and **compute efficiency** $\mathcal C_J$ as the amounts of data and compute needed to achieve performance $J$, respectively. Then, the best possible $J^*$ that we can attain given the budget $\mathcal{F}_0$ should be the one where we have used up exactly the allocated budget, i.e., $\mathcal F_0 = \mathcal C_{J^*} + \delta \cdot \mathcal D_{J^*}$. So, we can instead estimate $\mathcal D_J$ and $\mathcal C_J$ for multiple $J$, then select the largest $J$ fitting within the budget $\mathcal{F}_0$. This results in a different scaling question that we will study in this line of work:
+In practice, this problem is hard to answer directly, since reward transformations can make return unpredictable without actually changing the optimal policy at all. Therefore, we’ll consider the dual problem. Define **data efficiency** $\mathcal D_J$ and **compute efficiency** $\mathcal C_J$ as the amounts of data and compute needed to achieve performance $J$, respectively. Then, the best possible $J^*$ that we can attain given the budget $\mathcal{F}_0$ should be the one where we have used up exactly the allocated budget, i.e., $\mathcal F_0 = \mathcal C_{J^*} + \delta \cdot \mathcal D_{J^*}$. So, we can instead estimate $\mathcal D_J$ and $\mathcal C_J$ for multiple $J$, then select the largest $J$ fitting within the budget $\mathcal{F}_0$. This results in a different scaling question that we will study in this line of work:
 
 > _Given a performance threshold_ $J$, _how can we allocate our resources to minimize the budget_ ‍ $\mathcal C_J + \delta \cdot \mathcal D_J$_?_
 
@@ -49,7 +49,7 @@ $$\mathcal C_J \propto \mathcal D_J  \times \text{UTD} \times \text{batch size} 
 
 This gives us multiple ways to control budget in RL: one approach is to _increase the UTD ratio_, training more on the same data while reducing the amount of new data collected; another is to _increase model size_, enabling better learning from the same data. A third approach is to use both small model size and UTD ratio, but collect more data. However, these configurations do not behave identically. For example, it is well known that increasing the UTD ratio improves performance at small values, but increasing it excessively can [degrade performance](https://arxiv.org/abs/2205.07802), a form of “overfitting.” In repetitive, long-horizon tasks designed for scalability with horizon reduction, it was shown that scaling the model size led to [plateauing performance](https://seohong.me/blog/q-learning-is-not-yet-scalable/). Likewise, while larger models can reduce the required amount of data $\mathcal{D}_J$, it is known that smaller models [can reduce](https://arxiv.org/abs/2211.15144) the required amount of compute $\mathcal C_J$.
 
-Accordingly, we need to be quite careful when studying scaling laws for RL. Unlike pre-training, where models see each data point over a small number of epochs, off-policy RL repeatedly trains on the same data and is thus more prone to overfitting (see [footnote](#footnote-why-is-overfitting-especially-problematic-in-value-based-rl)).
+Accordingly, we need to be quite careful when studying scaling laws for RL. Unlike pre-training, where models see each data point over a small number of epochs, off-policy RL repeatedly trains on the same data and is thus more prone to overfitting (see [footnote](#why-is-overfitting-especially-problematic-in-value-based-rl)).
 Nevertheless, the optimal budget-minimizing solution appears to require passing over the same data more than once, which raises the question of how to set hyperparameters in the presence of overfitting. Empirically, we find that choosing the correct batch size and learning rate mitigates overfitting in both cases and enables scaling to higher UTD ratios and model sizes, as we discuss next.
 
 ## Part II: How do I set my hyperparameters…
@@ -68,7 +68,7 @@ Let’s first consider the effect of UTD scaling on the training data. For the p
 
 ![Overfitting vs batch size](/assets/images/overfitting_b.png "**Figure 2:** Overfitting increases with both UTD and batch size."){width=600px}
 
-Next, let’s consider the effect of UTD scaling on Q-learning dynamics. Intuitively, increasing the UTD overfits to the previous TD-target, making it more difficult to fit TD-targets later in training. Similarly, we observed that higher learning rates lead to high-magnitude updates against the target, moving the parameters to a state that would suffer from difficulty in fitting subsequent targets. Following prior work, we empirically find that one diagnosis for this plasticity loss is large parameter norm in the Q-network: increasing either UTD or learning rate corresponds to larger parameter norm. To counteract this effect, we decrease the learning rate for higher UTD.
+Next, let’s consider the effect of UTD scaling on Q-learning dynamics. Increasing the UTD aims to fit too well to the previous TD-target, making it more difficult to fit TD-targets later in training. Similarly, we observed that higher learning rates lead to high-magnitude updates against the target, moving the parameters to a state that would suffer from difficulty in fitting subsequent targets. Following prior work, we empirically find that one diagnosis for this plasticity loss is large parameter norm in the Q-network: increasing either UTD or learning rate corresponds to larger parameter norm. To counteract this effect, we decrease the learning rate for higher UTD.
 
 ![Parameter norm vs learning rate](/assets/images/pnorm_lr.png "**Figure 3:** Parameter norm, a proxy for plasticity loss, increases with both UTD and learning rate."){width=600px}
 
@@ -83,7 +83,7 @@ and both decay as power laws.
 
 :::jumpbox id="model_scaling":::
 
-Let’s now look at the case of model size scaling at a constant UTD. Generally, larger models are better performant, but it is unclear how one should set other hyperparameters when model size is increased. Here, since model size scaling does not affect data staleness, we’ll instead directly measure the Q-network’s generalization capabilities. To do so, we measure the TD error on both the training data and a held-out validation set of transitions drawn from a replay buffer with the same distribution.
+Let’s now look at the case of model size scaling at a constant UTD. Generally, larger models are better performant, but it is unclear how one should set other hyperparameters when model size is increased. Model size scaling is a complementary approach to scaling compute which does not require taking multiple updates on the same data, so we’ll instead directly measure the Q-network’s generalization capabilities. To do so, we measure the TD error on both the training data and a held-out validation set of transitions drawn from a replay buffer with the same distribution.
 
 ![TD-overfitting example](/assets/images/loss2x2_crawl.mp4 "**Figure 4:** Training and validation TD-errors reduce as model size increase. However, for smaller models, a larger batch size results in a higher final TD-error. This illustrates the role of batch size in modulating overfitting with TD-learning."){width=600px}
 
@@ -97,11 +97,10 @@ We find that small Q-nets produce TD-targets that generalize poorly, which is ex
 
 :::takeaway_begin:::
 
-- **TD-overfitting**: Overfitting is a property of the model capacity of TD-targets.
-- Smaller models produce TD-targets that generalize poorly, and have a small maximum
-  admissable batch size. Large models produce TD-targets that generalize well, and
-  enable larger batch sizes.
-- The best batch size increases with model size, but is bounded above by an asymptote.
+- **TD-overfitting**: Overfitting is a result of poor generalization of TD-targets from smaller models.
+- With low model capacity, increasing batch size results in a higher validation TD-error;
+  with high model capacity, increasing batch size results in a lower validation TD-error.
+- The best batch size increases with model size and decreases with the UTD ratio.
   :::takeaway_end:::
 
 ## Part IIIa: Budget-optimal scaling for off-policy RL
@@ -136,7 +135,7 @@ This tradeoff is predictable across multiple domains and algorithms. Moreover, t
 
 :::jumpbox id="model_scaling":::
 
-Now, we’ll additionally leverage incorporate model size into our fit. To do so, we will use our knowledge of the TD-overfitting phenomenon (discussed in the appendix of this post), which prescribes how batch sizes must be set when model size is changed. Long story short, we find that data efficiency scales as a sum of power laws with respect to the UTD and model size. (In Section 6 of our new paper, we also run a sensitivity analysis to show the importance of using the right batch size.)
+Now, we’ll additionally leverage incorporate model size into our fit. To do so, we will use our knowledge of the TD-overfitting phenomenon (see [deep dive](#deep-dive-how-does-overfitting-manifest-with-model-size-scaling)), which prescribes how batch sizes must be set when model size is changed. Long story short, we find that data efficiency scales as a sum of power laws with respect to the UTD and model size. (In Section 6 of our new paper, we also run a sensitivity analysis to show the importance of using the right batch size.)
 
 ![Data iso contours](/assets/images/data_iso_contour.mp4 "**Figure 7:** Each contour is the curve attaining the same fitted data efficiency to achieve a given target performance $J$. The budget-optimal UTD and model size are marked with stars."){width=600px}
 
@@ -151,7 +150,7 @@ Conveniently, our fit equation admits a closed-form solution for budget-optimal 
 
 ## A call for scalable RL algorithms
 
-Scaling laws provide a blueprint for building RL methods that scales. By identifying the scalable regime, we show that value-based RL admits predictable scaling once its core instabilities, which manifests as overfitting, are resolved. In supervised learning, scaling laws depend on the best choice of model size, batch size, and learning rate. In value-based RL, these relationships are much trickier to uncover, due to data distribution shift and the use of target networks in practice. These training dynamics are associated with a suite of parameters including the replay buffer size, optimizer, loss function (here, a distributional RL critic), and actor update frequency. Each new axis adds to the foundation for compute-optimal training, and scaling law research can extend to new parameters and training regimes.
+Scaling laws provide a blueprint for building RL methods that scales. By identifying the scalable regime, we show that value-based RL admits predictable scaling once its core instabilities, which manifests as overfitting, are resolved. In pre-training, scaling laws depend on the best choice of model size, batch size, and learning rate. In value-based RL, these relationships are much trickier to uncover, due to data distribution shift and the use of target networks in practice. These training dynamics are associated with a suite of parameters including the replay buffer size, optimizer, loss function (here, a distributional RL critic), and actor update frequency. Each new axis adds to the foundation for compute-optimal training, and scaling law research can extend to new parameters and training regimes.
 
 Ultimately, though, we must not only characterize existing methods, but also design better algorithms. We urge the field to provide systematic scalability studies:
 
@@ -181,7 +180,7 @@ By contrast, larger value functions produce features that can decouple its predi
 
 Check out [our new paper](https://arxiv.org/abs/2508.14881) (Section 5.3) for an empirical analysis of this phenomenon! Or go back to the [model scaling section](#when-i-scale-the-model-size).
 
-## Footnote: why is overfitting especially problematic in value-based RL?
+## Why is overfitting especially problematic in value-based RL?
 
 Language model research has shown that training on the same data more than [4 times](https://arxiv.org/abs/2305.16264) yields diminishing returns. For contrast, we can compute this number in off-policy RL training. In simulated robotic tasks, we typically “seed” a replay buffer with $|\mathcal D_0| \approx 5\text e3$ transitions, use a batch size $B \approx 512$, and train for up to $|\mathcal D_1| \approx 1\text e6$ transitions. By linearity of expectation, the $i$th element in the replay buffer is expected to be sampled in
 
@@ -196,9 +195,23 @@ Link back to our primer on [off-policy RL](#primer-on-off-policy-rl).
 We would like to thank [Zhiyuan Zhou](https://zhouzypaul.github.io/) for his helpful feedback
 on this post. The views in this blog are our own and do not necessarily reflect those of our coauthors.
 
+## Citation
+
+```bibtex
+@article{fu2025scaling,
+  title = {Scaling Laws for Value-Based RL},
+  author = {Fu, Preston and Rybkin, Oleh and Kumar, Aviral},
+  journal = {value-scaling.github.io},
+  year = {2025},
+  month = {September},
+  url = "https://value-scaling.github.io/"
+}
+```
+
 ## References
 
 :::small_begin:::
+
 Hilton et al. _Scaling laws for single-agent reinforcement learning_. arXiv, 2023.
 
 Hoffmann et al. _Training compute-optimal large language models_. NeurIPS, 2023.
@@ -226,4 +239,5 @@ Shao et al. _DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open 
 Yang et al. _Tensor programs V: Tuning large neural networks via zero-shot hyperparameter transfer_. NeurIPS, 2021.
 
 Zhang et al. _Which algorithmic choices matter at which batch sizes?_ NeurIPS, 2019.
+
 :::small_end:::
