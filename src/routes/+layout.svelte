@@ -4,10 +4,10 @@
   
   import { browser, dev } from "$app/environment";
 
-  import { inject } from '@vercel/analytics';
-  import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
-  inject({ mode: dev ? 'development' : 'production' });
-  injectSpeedInsights();
+  // import { inject } from '@vercel/analytics';
+  // import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
+  // inject({ mode: dev ? 'development' : 'production' });
+  // injectSpeedInsights();
 
   import { fly } from "svelte/transition";
 
@@ -20,6 +20,23 @@
   const isMobile = browser && /Android|iPhone/i.test(navigator.userAgent);
   const reducedMotion =
     browser && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  import { onMount } from 'svelte';
+  import { afterNavigate } from '$app/navigation';
+
+  const MEASUREMENT_ID = 'G-ZSV2YDNY0W';
+
+  function send_pageview(loc: Location) {
+    if (!window.gtag) return;
+    window.gtag('config', MEASUREMENT_ID, {
+      page_path: loc.pathname + loc.search + loc.hash
+    });
+  }
+
+  onMount(() => {
+    send_pageview(window.location);              // initial load
+    afterNavigate(() => send_pageview(window.location));  // on route changes
+  });
 </script>
 
 <svelte:head>

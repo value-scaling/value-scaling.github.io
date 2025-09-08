@@ -18,6 +18,18 @@
     />
     <link rel="icon" href="./favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZSV2YDNY0W"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag("js", new Date());
+      gtag("config", "G-ZSV2YDNY0W", {send_page_view: false});
+    </script>
+    <script>
+      if (window.location.hostname === "localhost") {
+        window.gtag = () => {};
+      }
+    </script>
     
 		<link href="./_app/immutable/assets/0.D33fkBba.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/2.BaqpwFEU.css" rel="stylesheet">
@@ -80,15 +92,15 @@
 		<link rel="preload" as="font" type="font/woff2" href="./_app/immutable/assets/KaTeX_Typewriter-Regular.CO6r4hn1.woff2" crossorigin>
 		<link rel="preload" as="font" type="font/woff" href="./_app/immutable/assets/KaTeX_Typewriter-Regular.C0xS9mPB.woff" crossorigin>
 		<link rel="preload" as="font" type="font/ttf" href="./_app/immutable/assets/KaTeX_Typewriter-Regular.D3Ib7_Hf.ttf" crossorigin>
-		<link rel="modulepreload" href="./_app/immutable/entry/start.D8Ow9w4c.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/entry.BxOCLtYx.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/scheduler.CGTIQush.js">
-		<link rel="modulepreload" href="./_app/immutable/entry/app.J6Ti0oYR.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/index.BzyyWbX-.js">
-		<link rel="modulepreload" href="./_app/immutable/nodes/0.owp48mja.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/stores.CxJa1_Bb.js">
-		<link rel="modulepreload" href="./_app/immutable/nodes/2.B-lRT2ea.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/each.BXdS67XN.js"><title>Scaling Laws for Value-Based RL</title><!-- HEAD_svelte-1r9of7h_START --><!-- HEAD_svelte-1r9of7h_END --><!-- HEAD_svelte-1u7ey3_START --><meta name="description" content="With the right design decisions, value-based RL admits predictable scaling."><meta property="og:title" content="Scaling Laws for Value-Based RL"><meta property="og:description" content="With the right design decisions, value-based RL admits predictable scaling."><!-- HEAD_svelte-1u7ey3_END -->
+		<link rel="modulepreload" href="./_app/immutable/entry/start.BMkYFd-Y.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/entry.Bn_SaDcs.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/scheduler.BgYmKTTO.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/app.DvKQYnK3.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/index.A5wVaqv5.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/0.tkyBn53s.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/stores.D43thUUC.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/2.Bq-d0OJS.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/each.BoQ2FUBB.js"><title>Scaling Laws for Value-Based RL</title><!-- HEAD_svelte-1r9of7h_START --><!-- HEAD_svelte-1r9of7h_END --><!-- HEAD_svelte-1u7ey3_START --><meta name="description" content="With the right design decisions, value-based RL admits predictable scaling."><meta property="og:title" content="Scaling Laws for Value-Based RL"><meta property="og:description" content="With the right design decisions, value-based RL admits predictable scaling."><!-- HEAD_svelte-1u7ey3_END -->
   </head>
   <body data-sveltekit-preload-data="hover">
     <div style="display: contents">   <header class="layout-md justify-between items-start" data-sveltekit-noscroll data-sveltekit-preload-code="eager" data-svelte-h="svelte-2063xj"><div class="mb-8 unselectable"><h1 class="font-bold text-black text-3xl mb-4">Scaling Laws for Value-Based RL</h1> <p class="text-black text-lg"><a href="https://prestonfu.com" class="link-no-underline">Preston Fu</a>,
@@ -231,7 +243,7 @@ on this post. The views in this blog are our own and do not necessarily reflect 
 			
 			<script>
 				{
-					__sveltekit_11qgoqh = {
+					__sveltekit_1q1azjk = {
 						base: new URL(".", location).pathname.slice(0, -1)
 					};
 
@@ -240,8 +252,8 @@ on this post. The views in this blog are our own and do not necessarily reflect 
 					const data = [null,null];
 
 					Promise.all([
-						import("./_app/immutable/entry/start.D8Ow9w4c.js"),
-						import("./_app/immutable/entry/app.J6Ti0oYR.js")
+						import("./_app/immutable/entry/start.BMkYFd-Y.js"),
+						import("./_app/immutable/entry/app.DvKQYnK3.js")
 					]).then(([kit, app]) => {
 						kit.start(app, element, {
 							node_ids: [0, 2],
