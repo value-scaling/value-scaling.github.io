@@ -26,14 +26,12 @@
 
 @layer components {
   .link {
-    @apply underline underline-offset-[3px] decoration-neutral-400 dark:decoration-neutral-500;
+    @apply underline underline-offset-[3px] decoration-neutral-400;
     @apply hover:text-black hover:decoration-black transition-colors;
-    @apply dark:hover:text-white dark:hover:decoration-white;
   }
   .link-no-underline {
-    @apply decoration-neutral-400 dark:decoration-neutral-500;
+    @apply decoration-neutral-400;
     @apply hover:text-black hover:decoration-black transition-colors hover:underline hover:underline-offset-[3px];
-    @apply dark:hover:text-white dark:hover:decoration-white;
   }
 
   .layout-md {
@@ -60,11 +58,7 @@ body {
 }
 
 ::selection {
-  @apply bg-sky-100 dark:bg-sky-600;
-}
-
-.dark {
-  color-scheme: dark;
+  @apply bg-sky-100;
 }
 
 @media screen and (min-width: 960px) {
