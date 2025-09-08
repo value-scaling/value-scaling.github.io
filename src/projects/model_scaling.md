@@ -1,7 +1,7 @@
 ---
 title: Compute-Optimal Scaling for Value-Based Deep RL
 link: https://arxiv.org/abs/2508.14881
-date: 2025-07-07
+date: 2025-08-25
 highlight: true
 image_before: /assets/images/model_scaling_before.png
 image_after: /assets/images/model_scaling_3d.mp4

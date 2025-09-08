@@ -74,7 +74,7 @@ Next, let’s consider the effect of UTD scaling on Q-learning dynamics. Intuiti
 
 :::takeaway_begin:::
 The best-choice batch size and learning rate are predictable functions of the UTD ratio,
-and both decay as a power law.
+and both decay as power laws.
 :::takeaway_end:::
 
 <!-- ``` -->
