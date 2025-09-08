@@ -49,12 +49,7 @@
       return out;
     },
     heading(text: string, level: number, raw: string, slugger: any) {
-      const id = slugger
-        ? slugger.slug(raw)
-        : String(raw || text)
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, "");
+      const id = slugger ? slugger.slug(raw) : slugify(raw || text);
       // Keep plain heading text; the scroll meter will link to #id
       return `<h${level} id="${id}">${text}</h${level}>`;
     },
@@ -62,6 +57,13 @@
       return `<blockquote class="inline-block bg-neutral-50 border-l-4 border-neutral-600 rounded px-3 py-2 align-middle my-2">${quote}</blockquote>`;
     },
   };
+
+  function slugify(s: string) {
+    return String(s || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
 
   const imageAttrExtension = {
     name: "imageAttr",
@@ -106,7 +108,7 @@
         // read optional freeze ms from markdown: {... freeze=10000}
         const freezeMs = token.attrs["freeze"] || "10000";
 
-        out += `<video class="block mx-auto autoplay-on-fullview md-video" aria-label="${token.alt || ""}"`;
+        out += `<video class="block mx-auto autoplay-on-fullview md-video unselectable" aria-label="${token.alt || ""}" id="fig-${slugify(token.alt || "")}"`;
         const hasPlaysinline = Object.prototype.hasOwnProperty.call(
           token.attrs,
           "playsinline",
@@ -133,10 +135,9 @@
         // carry freeze config for runtime
         out += ` data-freeze-ms="${freezeMs}"`;
 
-        // do NOT add controls here; we’ll toggle on hover via JS
         out += `><source src="${token.src}#t=0.1" type="${sourceType}" /></video>`;
       } else {
-        out += `<img src="${token.src}" alt="${token.alt}" class="block mx-auto"`;
+        out += `<img src="${token.src}" alt="${token.alt}" id="fig-${slugify(token.alt)}" class="block mx-auto unselectable"`;
         for (const k in token.attrs) {
           out += ` ${k}="${token.attrs[k]}"`;
         }

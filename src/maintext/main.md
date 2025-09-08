@@ -26,13 +26,13 @@ The performance metric is an agent’s performance, i.e. the average return atta
 
 In practice, this problem is hard to answer directly, since the reward scale can make return unpredictable without actually changing the optimal policy at all. Therefore, we’ll consider the dual problem. Define **data efficiency** $\mathcal D_J$ and **compute efficiency** $\mathcal C_J$ as the amounts of data and compute needed to achieve performance $J$, respectively. Then, the best possible $J^*$ that we can attain given the budget $\mathcal{F}_0$ should be the one where we have used up exactly the allocated budget, i.e., $\mathcal F_0 = \mathcal C_{J^*} + \delta \cdot \mathcal D_{J^*}$. So, we can instead estimate $\mathcal D_J$ and $\mathcal C_J$ for multiple $J$, then select the largest $J$ fitting within the budget $\mathcal{F}_0$. This results in a different scaling question that we will study in this line of work:
 
-> _Given a performance threshold_ $J$, _how can we allocate our resources to minimize the budget_ $\mathcal C_J + \delta \cdot \mathcal D_J$_?_
+> _Given a performance threshold_ $J$, _how can we allocate our resources to minimize the budget_ ‍ $\mathcal C_J + \delta \cdot \mathcal D_J$_?_
 
 Scaling laws have been [studied](https://arxiv.org/abs/2301.13442) for **on-policy algorithms**, like [PPO](https://arxiv.org/abs/1707.06347) and [GRPO](https://arxiv.org/abs/2402.03300). On-policy algorithms iteratively collect a batch of trajectories from the current policy $\pi$, score those trajectories, and take a gradient step toward high-scoring trajectories (perhaps subject to constraints). At each iteration, once the update is done, the data must be thrown away, and a new batch is collected from the new policy. This highlights a data efficiency limitation: on-policy algorithms discard data, and is not optimal at minimizing budgets. Thus, we turn to off-policy RL, which can learn from data collected by policies other than $\pi$. We briefly review off-policy RL.
 
 ### Primer on off-policy RL
 
-Modern off-policy RL typically trains a **value function** $Q_\theta(s,a)$. The learned value function is agnostic to the policy used to collect state-action transitions (”behavior policy”) – instead, these transitions are sampled from a replay buffer $\mathcal P$ storing all past transitions. The Q-function then aims to estimate the expected reward under the learned policy. In practice, the Q-network is trained by regressing onto a _bootstrapped_ target, called the **temporal difference (TD)-target** $r(s,a) + \gamma \bar Q(s’, a’)$, where $\bar Q$comes from a stale copy of the Q-network, often called the target network. The regression loss, which is referred to as the **temporal difference error (TD error)** is given by:
+Modern off-policy RL typically trains a **value function** $Q_\theta(s,a)$. The learned value function is agnostic to the policy used to collect state-action transitions (”behavior policy”) – instead, these transitions are sampled from a replay buffer $\mathcal P$ storing all past transitions. The Q-function then aims to estimate the expected reward under the learned policy. In practice, the Q-network is trained by regressing onto a _bootstrapped_ target, called the **temporal difference (TD)-target** $r(s,a) + \gamma \bar Q(s', a')$, where $\bar Q$ comes from a stale copy of the Q-network, often called the target network. The regression loss, which is referred to as the **temporal difference error (TD error)** is given by:
 
 $$L(\theta) = \mathbb{E}_{(s, a, s') \sim \mathcal{P}, a' \sim \pi(\cdot|s')}\left[ \left(r(s, a) + \gamma \bar{Q}(s', a') - Q_\theta(s, a) \right)^2\right]$$
 
@@ -89,7 +89,7 @@ Let’s now look at the case of model size scaling at a constant UTD. Generally,
 
 Unsurprisingly, increasing the batch size improves training TD-error. However, the effect on validation TD-error is more nuanced and depends on the model size. Why does this happen?
 
-We find that small Q-nets produce TD-targets that generalize poorly, which is exacerbated by larger batch sizes. Larger Q-networks produce better TD-targets and can benefit from large batch sizes. We encourage you to check out our understanding of this phenomenon, which we coin **TD-overfitting**, in this blog’s appendix.
+We find that small Q-nets produce TD-targets that generalize poorly, which is exacerbated by larger batch sizes. Larger Q-networks produce better TD-targets and can benefit from large batch sizes. We encourage you to check out our understanding of this phenomenon, which we coin **TD-overfitting**, in the [deep dive](#deep-dive-how-does-overfitting-manifest-with-model-size-scaling) below.
 
 **So, how do I set my batch size?** Empirically, we observe that the best batch size increases with model size, but eventually reaches an upward asymptote. Check out [our new paper](https://arxiv.org/abs/2508.14881) for our fit equation! Empirically we do not observe a significant interaction effect between UTD and model size, i.e. our fit factorizes into a power law decay in UTD and an upward asymptote in model size.
 
@@ -114,7 +114,7 @@ With the design of hyperparameters above, we now attempt to put together scaling
 
 Finally, we are in a position to answer our question:
 
-> _Given a performance threshold_ $J$, _what is the minimum achievable budget_ $\mathcal C_J + \delta \cdot \mathcal D_J$\*, where the **data efficiency\*** $\mathcal D_J$ \*and **compute efficiency\*** $\mathcal C_J$ _are the amounts of data and compute spent to achieve performance_ $J$_?_
+> _Given a performance threshold_ $J$, _what is the minimum achievable budget_ ‍ $\mathcal C_J + \delta \cdot \mathcal D_J$, where the **data efficiency** $\mathcal D_J$ and **compute efficiency** $\mathcal C_J$ _are the amounts of data and compute spent to achieve performance_ $J$_?_
 
 We can consider the amount of compute, in FLOPs, required to achieve a given performance threshold. For each performance threshold, there is a Pareto frontier defining the tradeoff between data and compute requirements, and the UTD defines the position along this curve. Along this Pareto frontier, there is a unique budget-minimizing choice of UTD. In our paper, we showed that the budget-optimal partition between data and compute is predictable, as well as the budget-optimal UTD itself!
 
@@ -165,9 +165,13 @@ The goal is not just to show that RL _can_ scale, but to establish a framework w
 
 <br>
 
+---
+
+<br>
+
 ## Deep dive: how does overfitting manifest with model size scaling?
 
-In Figure 4, we observed that for small models, larger batch sizes worsened generalization; for large models, larger batch sizes helped. (See Appendix B of [our new paper](https://arxiv.org/abs/2508.14881) for more details on constructing the validation dataset). It’s helpful to look at these curves over the course of training, since in the practical implementation of TD-learning, value functions rarely fully fit the moving TD-targets.
+In [Figure 4](#fig-td-overfitting-example), we observed that for small models, larger batch sizes worsened generalization; for large models, larger batch sizes helped. (See Appendix B of [our new paper](https://arxiv.org/abs/2508.14881) for more details on constructing the validation dataset). It’s helpful to look at these curves over the course of training, since in the practical implementation of TD-learning, value functions rarely fully fit the moving TD-targets.
 
 **Conceptual view:** We argue that this deviation from classical overfitting is explained by the use of target networks in TD-learning, and coin this phenomenon **TD-overfitting**. Consider a smaller value function. Due to its low representational capacity, a model would entangle features used for predicting Q-values across multiple (state, action) pairs. As we scale up the batch size, this issue is exacerbated since these incorrect gradient updates become more “directed”. Fitting the Q-function, and hence the TD-targets, on some transitions comes at the expense of others.
 
@@ -194,8 +198,8 @@ on this post. The views in this blog are our own and do not necessarily reflect 
 
 ## References
 
-:::small_begin:::
-Hilton et al. _Scaling laws for single-agent reinforcement learning_. arXiv, 2023.
+:::small*begin:::
+Hilton et al. \_Scaling laws for single-agent reinforcement learning*. arXiv, 2023.
 
 Hoffmann et al. _Training compute-optimal large language models_. NeurIPS, 2023.
 

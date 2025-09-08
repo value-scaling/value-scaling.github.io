@@ -80,3 +80,7 @@ body {
   -ms-user-select: none;
   user-select: none;
 }
+
+hr {
+  @apply border-neutral-300;
+}

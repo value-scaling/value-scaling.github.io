@@ -205,7 +205,7 @@
   .gradient {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, #77aadc 0%, #bacc35 100%); /* blue→green */
+    background: linear-gradient(180deg, #77aabb 0%, #bbcc33 100%); /* blue→green */
     will-change: clip-path;
   }
 
