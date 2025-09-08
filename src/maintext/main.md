@@ -198,8 +198,8 @@ on this post. The views in this blog are our own and do not necessarily reflect 
 
 ## References
 
-:::small*begin:::
-Hilton et al. \_Scaling laws for single-agent reinforcement learning*. arXiv, 2023.
+:::small_begin:::
+Hilton et al. _Scaling laws for single-agent reinforcement learning_. arXiv, 2023.
 
 Hoffmann et al. _Training compute-optimal large language models_. NeurIPS, 2023.
 
