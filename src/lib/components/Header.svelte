@@ -23,7 +23,7 @@
   data-sveltekit-noscroll
   data-sveltekit-preload-code="eager"
 >
-  <div class="mb-8 unselectable">
+  <div class="mb-8">
     <h1 class="font-bold text-black text-3xl mb-4">
       Scaling Laws for Value-Based RL
     </h1>

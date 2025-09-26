@@ -25,5 +25,5 @@ resources:
 [Sergey Levine](https://people.eecs.berkeley.edu/~svlevine/),
 [Aviral Kumar](https://aviralkumar2907.github.io/)
 
-_International Conference on Machine Learning (ICML)_, 2025 \
-_ICLR Robot Learning Workshop_, 2025 (**oral presentation**)
+_ICML_, 2025 \
+_ICLR Robot Learning Workshop_, 2025 (**oral**)

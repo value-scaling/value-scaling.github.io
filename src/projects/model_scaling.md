@@ -23,4 +23,4 @@ resources:
 [Sergey Levine](https://people.eecs.berkeley.edu/~svlevine/),
 [Aviral Kumar](https://aviralkumar2907.github.io/)
 
-Preprint
+_NeurIPS_, 2025

@@ -53,7 +53,7 @@
 
 <div
   role="group"
-  class="block -mx-4 mb-4 px-4 py-4 transition-colors unselectable
+  class="block -mx-4 mb-4 px-4 py-4 transition-colors
     {data.highlight ? 'hover:bg-sky-50 bg-sky-50' : ''}
   "
   on:mouseenter={() => {
@@ -79,7 +79,7 @@
 >
   <div class="grid grid-cols-4 gap-4">
     <!-- image & title as before… -->
-    <div class="col-span-4 md:col-span-1">
+    <div class="col-span-4 md:col-span-1 unselectable">
       <div class="relative w-full max-w-80 mx-auto">
         <img
           src="{image_path}"
@@ -124,7 +124,7 @@
             <a
               href={url}
               target="_blank"
-              class="px-2 py-1 bg-sky-700 text-white text-[0.9rem] leading-[1rem] rounded hover:bg-sky-800 transition"
+              class="px-2 py-1 bg-sky-700 text-white text-[0.9rem] leading-[1rem] rounded hover:bg-sky-800 transition unselectable"
             >
               {label}
             </a>
